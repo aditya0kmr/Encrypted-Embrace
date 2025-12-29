@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { CatmullRomCurve3, Vector3 } from 'three'
 import { Line, Text, Image } from '@react-three/drei'
 import useUniverseStore from '../../../stores/useUniverseStore'
+import { useCollection } from '../../../firebase/hooks'
 
 function TimelineNode({ position, title, year, image, onClick }) {
     return (
@@ -22,6 +23,7 @@ function TimelineNode({ position, title, year, image, onClick }) {
 
 export default function TimelinePlanet() {
     const { exitPlanet } = useUniverseStore()
+    const { data: events, loading } = useCollection('timelineEvents')
 
     // Define the serpent path
     const points = useMemo(() => [
@@ -29,19 +31,22 @@ export default function TimelinePlanet() {
         new Vector3(-2, 0, 2),
         new Vector3(1, -1, -2),
         new Vector3(4, 2, 0),
-        new Vector3(6, 0, 3)
+        new Vector3(6, 0, 3),
+        new Vector3(4, -2, 4) // Extended path
     ], [])
 
     const curve = useMemo(() => new CatmullRomCurve3(points), [points])
 
-    // Mock Data (replace with Firestore later)
-    const milestones = [
-        { pos: points[0], title: "First Met", year: "2022", img: "/assets/images/us/we together 001.jpg" },
-        { pos: points[1], title: "Sharda Uni", year: "2023", img: "/assets/images/aadi/aadi001.jpg" },
-        { pos: points[2], title: "First Date", year: "2023", img: "/assets/images/us/we together 002.jpg" },
-        { pos: points[3], title: "Dehradun Trip", year: "2024", img: "/assets/images/jack/jack 001.jpg" },
-        { pos: points[4], title: "Forever", year: "Future", img: null },
+    // Map real data to path points. If no data, use default/empty or mock.
+    const displayEvents = events.length > 0 ? events : [
+        { title: "Waiting for Memories...", year: "202X", img: null }
     ]
+
+    // Helper to place nodes along the curve evenly
+    const getPointAt = (i, total) => {
+        const t = i / (total - 1 || 1)
+        return curve.getPoint(t)
+    }
 
     return (
         <group>
@@ -49,13 +54,13 @@ export default function TimelinePlanet() {
             <Line points={points} color="#00ffff" lineWidth={3} dashed={false} />
 
             {/* Nodes */}
-            {milestones.map((m, i) => (
+            {displayEvents.map((m, i) => (
                 <TimelineNode
-                    key={i}
-                    position={m.pos}
+                    key={m.id || i}
+                    position={getPointAt(i, displayEvents.length)}
                     title={m.title}
-                    year={m.year}
-                    image={m.img} // Using the copied assets
+                    year={m.date ? m.date.slice(0, 4) : m.year}
+                    image={m.images ? m.images[0] : m.img}
                     onClick={() => console.log("Open milestone:", m.title)}
                 />
             ))}

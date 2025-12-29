@@ -1,6 +1,7 @@
+```
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text, Float, Sparkles } from '@react-three/drei'
+import { Text, Float, Sparkles, MeshTransmissionMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import useUniverseStore from '../../stores/useUniverseStore'
 
@@ -29,14 +30,18 @@ function Crystal({ position, color, label, onClick, rotationSpeed = 0.2 }) {
                     onClick={onClick}
                 >
                     <octahedronGeometry args={[1, 0]} />
-                    <meshPhysicalMaterial
-                        color={color}
-                        transmission={0.6}
+                    {/* HIGH QUALITY GLASS MATERIAL */}
+                    <MeshTransmissionMaterial
+                        backside
+                        samples={16}
                         thickness={2}
-                        roughness={0}
-                        clearcoat={1}
-                        emissive={color}
-                        emissiveIntensity={0.2}
+                        chromaticAberration={0.5}
+                        anisotropy={0.5}
+                        distortion={0.5}
+                        distortionScale={0.5}
+                        temporalDistortion={0.5}
+                        color={color}
+                        toneMapped={false}
                     />
                 </mesh>
                 <Text
@@ -49,7 +54,7 @@ function Crystal({ position, color, label, onClick, rotationSpeed = 0.2 }) {
                     {label}
                 </Text>
             </Float>
-            {hovered && <Sparkles count={20} scale={3} size={2} speed={0.4} opacity={0.5} color={color} />}
+            {hovered && <Sparkles count={40} scale={4} size={4} speed={0.4} opacity={0.8} color={color} />}
         </group>
     )
 }
@@ -60,7 +65,7 @@ export default function DualCrystalLogin() {
     const handleLogin = (role) => {
         // In a real implementation this would trigger the Auth Overlay
         // For prototype visualization we define the interaction
-        console.log(`Selected ${role} path`)
+        console.log(`Selected ${ role } path`)
         // Temporary Direct Login for testing visuals
         // login({ name: role }, role === 'guest' ? 'guest' : 'admin')
     }

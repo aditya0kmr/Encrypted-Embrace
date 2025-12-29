@@ -15,30 +15,74 @@ export default function AuthOverlay() {
     // Hardcoded Love Code for demo (should be hash in env)
     const EXPECTED_LOVE_CODE = "15062024"
 
-    const handleLogin = (e) => {
+    const [welcomeMsg, setWelcomeMsg] = useState(null)
+
+    const handleLogin = async (e) => {
         e.preventDefault()
         setError('')
 
+        let role = 'guest'
+        let name = 'Guest Star'
+
         if (selectedRole === 'guest') {
-            login({ displayName: 'Guest Star' }, 'guest')
-            return
+            // Guest defaults
+        } else {
+            // Admin Check
+            if (loveCode === EXPECTED_LOVE_CODE) {
+                if (password === 'admin123') {
+                    role = 'admin'
+                    if (selectedRole === 'aadi') {
+                        name = 'Architect Aadi'
+                        setWelcomeMsg("Welcome back, Architect of Our Universe.")
+                    } else {
+                        name = 'Investigator Nanniii'
+                        setWelcomeMsg("Welcome, Investigator Nanniii. Evidence shows 100% connection.")
+                    }
+                } else {
+                    setError('Incorrect Personal Password')
+                    return
+                }
+            } else {
+                setError('The Stars Do Not Align (Wrong Love Code)')
+                return
+            }
         }
 
-        // Admin Check
-        if (loveCode === EXPECTED_LOVE_CODE) {
-            if (password === 'admin123') { // Placeholder logic
-                login({ displayName: selectedRole === 'aadi' ? 'Architect Aadi' : 'Investigator Nanniii' }, 'admin')
-            } else {
-                setError('Incorrect Personal Password')
-            }
-        } else {
-            setError('The Stars Do Not Align (Wrong Love Code)')
+        // If guest, simpler welcome
+        if (selectedRole === 'guest') {
+            setWelcomeMsg("Welcome, Traveler from another star.")
         }
+
+        // Play Transition Sequence
+        setTimeout(() => {
+            login({ displayName: name }, role)
+        }, 4000) // 4 seconds to read message
     }
 
     // We need a way to know WHICH crystal was clicked. 
     // For this step, I'll add a temporary selector to test.
     if (useUniverseStore.getState().isAuthenticated) return null
+
+    if (welcomeMsg) {
+        return (
+            <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                background: 'black', color: 'white', display: 'flex',
+                justifyContent: 'center', alignItems: 'center',
+                zIndex: 20, animation: 'fadeIn 2s ease-in'
+            }}>
+                <h1 style={{
+                    fontFamily: 'serif', fontStyle: 'italic', fontSize: '2rem',
+                    textShadow: '0 0 20px gold', textAlign: 'center', padding: '20px'
+                }}>
+                    {welcomeMsg}
+                </h1>
+                <style>{`
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                `}</style>
+            </div>
+        )
+    }
 
     return (
         <div style={{
@@ -97,6 +141,21 @@ export default function AuthOverlay() {
                     <button type="submit" style={actionBtnStyle}>
                         {selectedRole === 'guest' ? 'Enter Orbit' : 'Fuse Crystals'}
                     </button>
+
+                    {selectedRole === 'aadi' && handleLogin && (
+                        <button
+                            type="button"
+                            onClick={async (e) => {
+                                e.preventDefault()
+                                const { seedContent } = await import('../../firebase/seed')
+                                await seedContent()
+                                alert("Universe Expanded with New Memories")
+                            }}
+                            style={{ marginTop: '10px', background: 'transparent', border: '1px dashed #333', color: '#333', fontSize: '0.6rem', cursor: 'pointer' }}
+                        >
+                            [ARCHITECT PROTOCOL: SEED CONTENT]
+                        </button>
+                    )}
 
                     {error && <p style={{ color: '#ff4444', fontSize: '0.9rem' }}>{error}</p>}
                     <button type="button" onClick={() => setSelectedRole(null)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '0.8rem' }}>

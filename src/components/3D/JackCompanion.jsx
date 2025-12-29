@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { Sphere, Cylinder } from '@react-three/drei'
 import * as THREE from 'three'
 import useUniverseStore from '../../stores/useUniverseStore'
 
@@ -7,68 +8,78 @@ export default function JackCompanion() {
     const group = useRef()
     const { mood } = useUniverseStore()
 
-    // Simple Low Poly Dog (Abstract Construction)
-    // Body, Head, Legs, Tail
+    // Smoother Geometry using Spheres instead of Capsules for a "Baymax-ish" cute look
 
     useFrame(({ clock, mouse }) => {
-        // 1. Follow logic: Jack follows the mouse/cursor with a delay (lerp)
-        // We can use a dummy vector for the target
-        const targetX = (mouse.x * 10) / 2 // Approximate world space mapping
+        // Follow logic (same as before but smoother lerp)
+        const targetX = (mouse.x * 10) / 2
         const targetY = (mouse.y * 10) / 2
 
-        // Lerp position
         if (group.current) {
-            group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, targetX + 1, 0.05) // Offset by 1 unit
-            group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, targetY - 1, 0.05)
+            group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, targetX + 1.2, 0.08)
+            group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, targetY - 1.2, 0.08)
 
-            // 2. Animation: Happy Hop (Sine wave on Y)
+            // Animation: Happy Hop
             const t = clock.getElapsedTime()
-            const hopSpeed = mood === 'happy' ? 10 : 5
-            const hopHeight = mood === 'happy' ? 0.1 : 0.05
+            const hopSpeed = mood === 'happy' ? 12 : 6
+            const hopHeight = mood === 'happy' ? 0.15 : 0.05
             group.current.position.y += Math.sin(t * hopSpeed) * hopHeight
 
-            // 3. Rotation: Look at cursor
-            group.current.lookAt(targetX, targetY, 2)
+            // Face cursor
+            group.current.lookAt(targetX, targetY, 5)
         }
     })
 
     return (
-        <group ref={group} scale={0.5}>
-            {/* Body */}
-            <mesh position={[0, 0, 0]}>
-                <capsuleGeometry args={[0.3, 0.6, 4, 8]} />
-                <meshStandardMaterial color="white" roughness={0.9} />
-            </mesh>
+        <group ref={group} scale={0.4}>
+            {/* Body: Merged Spheres for organic look */}
+            <Sphere args={[0.7, 32, 32]} position={[0, 0, 0]}>
+                <meshStandardMaterial color="white" roughness={0.4} metalness={0.1} />
+            </Sphere>
 
             {/* Head */}
-            <mesh position={[0, 0.4, 0.3]}>
-                <sphereGeometry args={[0.25]} />
-                <meshStandardMaterial color="white" />
+            <Sphere args={[0.5, 32, 32]} position={[0, 0.9, 0.2]}>
+                <meshStandardMaterial color="white" roughness={0.4} />
+            </Sphere>
+
+            {/* Eyes (Black beads) */}
+            <Sphere args={[0.08]} position={[-0.15, 1.0, 0.6]}>
+                <meshStandardMaterial color="black" roughness={0} />
+            </Sphere>
+            <Sphere args={[0.08]} position={[0.15, 1.0, 0.6]}>
+                <meshStandardMaterial color="black" roughness={0} />
+            </Sphere>
+
+            {/* Ears (Floppy Lab ears) */}
+            <mesh position={[-0.45, 1.0, 0.2]} rotation={[0, 0, 0.5]}>
+                <capsuleGeometry args={[0.15, 0.6]} />
+                <meshStandardMaterial color="#eeeeee" />
+            </mesh>
+            <mesh position={[0.45, 1.0, 0.2]} rotation={[0, 0, -0.5]}>
+                <capsuleGeometry args={[0.15, 0.6]} />
+                <meshStandardMaterial color="#eeeeee" />
             </mesh>
 
-            {/* Ears */}
-            <mesh position={[-0.15, 0.55, 0.3]} rotation={[0, 0, 0.5]}>
-                <coneGeometry args={[0.1, 0.2]} />
-                <meshStandardMaterial color="#ddd" />
-            </mesh>
-            <mesh position={[0.15, 0.55, 0.3]} rotation={[0, 0, -0.5]}>
-                <coneGeometry args={[0.1, 0.2]} />
-                <meshStandardMaterial color="#ddd" />
-            </mesh>
+            {/* Legs (Stubby cute) */}
+            <Sphere args={[0.25]} position={[-0.4, -0.6, 0.3]} />
+            <Sphere args={[0.25]} position={[0.4, -0.6, 0.3]} />
+            <Sphere args={[0.25]} position={[-0.4, -0.6, -0.3]} />
+            <Sphere args={[0.25]} position={[0.4, -0.6, -0.3]} />
 
             {/* Tail */}
-            <mesh position={[0, -0.2, -0.4]} rotation={[-1, 0, 0]}>
-                <cylinderGeometry args={[0.05, 0.02, 0.4]} />
+            <mesh position={[0, -0.2, -0.6]} rotation={[-2, 0, 0]}>
+                <capsuleGeometry args={[0.08, 0.5]} />
                 <meshStandardMaterial color="white" />
             </mesh>
 
             {/* Collar */}
-            <mesh position={[0, 0.25, 0.2]}>
-                <torusGeometry args={[0.22, 0.05, 8, 16]} />
-                <meshStandardMaterial color={mood === 'loving' ? 'pink' : 'red'} />
+            <mesh position={[0, 0.6, 0.2]}>
+                <torusGeometry args={[0.52, 0.08, 16, 32]} />
+                <meshStandardMaterial color={mood === 'loving' ? '#ff69b4' : '#ff3333'} />
             </mesh>
 
-            <pointLight distance={2} intensity={0.5} color="white" />
+            {/* Glow */}
+            <pointLight distance={3} intensity={0.8} color="white" />
         </group>
     )
 }

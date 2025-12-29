@@ -10,19 +10,36 @@ import CosmicAtrium from './components/3D/CosmicAtrium'
 import JackCompanion from './components/3D/JackCompanion'
 import TimelinePlanet from './components/3D/Planets/TimelinePlanet'
 import GalleryPlanet from './components/3D/Planets/GalleryPlanet'
+import LettersPlanet from './components/3D/Planets/LettersPlanet'
+import QuotesPlanet from './components/3D/Planets/QuotesPlanet'
+import HerCornerPlanet from './components/3D/Planets/HerCornerPlanet'
+import FavoritesPlanet from './components/3D/Planets/FavoritesPlanet'
+import JackLDRPlanet from './components/3D/Planets/JackLDRPlanet'
+import BinPlanet from './components/3D/Planets/BinPlanet'
 import { Text } from '@react-three/drei'
 
+import Atmosphere from './components/3D/Atmosphere'
+import AudioManager from './components/AudioManager'
+import { useLatestMood } from './firebase/hooks'
+
 function SceneContent() {
-    const { currentView } = useUniverseStore()
+    const { currentView, activePlanet } = useUniverseStore() // Destructure activePlanet here for cleaner access
+
+    // Real-time synchronization of Planet Mood
+    useLatestMood()
 
     return (
         <>
             <color attach="background" args={['#050510']} />
 
-            {/* Global Lighting */}
-            <ambientLight intensity={0.5} />
+            {/* Audio System */}
+            <AudioManager />
+
+            {/* Mood-based Personal Weather */}
+            <Atmosphere />
+
+            {/* Global Lighting Support */}
             <pointLight position={[10, 10, 10]} intensity={1} />
-            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
             {/* Routes Switch */}
             {currentView === 'login' && <DualCrystalLogin />}
@@ -31,7 +48,14 @@ function SceneContent() {
             {/* Active Planet Views */}
             {currentView === 'planet' && activePlanet === 'timeline' && <TimelinePlanet />}
             {currentView === 'planet' && activePlanet === 'gallery' && <GalleryPlanet />}
-            {currentView === 'planet' && !['timeline', 'gallery'].includes(activePlanet) && (
+            {currentView === 'planet' && activePlanet === 'letters' && <LettersPlanet />}
+            {currentView === 'planet' && activePlanet === 'quotes' && <QuotesPlanet />}
+            {currentView === 'planet' && activePlanet === 'herCorner' && <HerCornerPlanet />}
+            {currentView === 'planet' && activePlanet === 'favorites' && <FavoritesPlanet />}
+            {currentView === 'planet' && activePlanet === 'jack' && <JackLDRPlanet />}
+            {currentView === 'planet' && activePlanet === 'bin' && <BinPlanet />}
+
+            {currentView === 'planet' && !['timeline', 'gallery', 'letters', 'quotes', 'herCorner', 'favorites', 'jack', 'bin'].includes(activePlanet) && (
                 // Placeholder for others
                 <group>
                     <Text color="white" fontSize={1}>Work in Progress: {activePlanet}</Text>

@@ -108,6 +108,17 @@ export default function CosmicAtrium() {
                 />
             )}
 
+            {/* 7. The Bin (Aadi Only) */}
+            {(user?.displayName?.includes('Aadi') || (user?.role === 'admin' && !user?.displayName?.includes('Nanniii'))) && (
+                <Planet
+                    position={[0, -4, -4]}
+                    color="#333"
+                    label="The Bin"
+                    size={0.6}
+                    onClick={() => enterPlanet('bin')}
+                />
+            )}
+
             {/* Ambient particles */}
             {/* (Can add Sparkles or Stars here specific to Atrium) */}
         </group>
