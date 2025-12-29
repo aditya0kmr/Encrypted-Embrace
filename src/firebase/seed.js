@@ -1,5 +1,5 @@
 import { collection, writeBatch, doc } from 'firebase/firestore'
-import { db } from '../config'
+import { db } from './config'
 
 const LOVE_LETTERS = [
     {
