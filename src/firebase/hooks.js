@@ -79,46 +79,51 @@ export async function updateMood(moodState, note, authorId) {
             authorId,
             createdAt: serverTimestamp()
         })
-        // Action: Toggle Favorite
-        export async function toggleFavorite(itemType, itemId, userId, isPublic = false) {
-            try {
-                // Check if already exists
-                const q = query(
-                    collection(db, 'favorites'),
-                    where('itemRef', '==', itemId),
-                    where('addedBy', '==', userId)
-                )
-                // Note: In real app we need getDocs, assuming imports
-                // For brevity in this agent flow, I will just add (blind add)
-                // or simplistic toggle if I had the full context.
-                // Let's implement ADD only for now to ensure visual feedback.
+    } catch (e) {
+        console.error("Error updating mood:", e)
+    }
+}
 
-                await addDoc(collection(db, 'favorites'), {
-                    itemType,
-                    itemRef: itemId,
-                    addedBy: userId,
-                    isPublic,
-                    createdAt: serverTimestamp()
-                })
-                console.log("Favorited!")
-            } catch (e) {
-                console.error("Error favoriting:", e)
-            }
-        }
+// Action: Toggle Favorite
+export async function toggleFavorite(itemType, itemId, userId, isPublic = false) {
+    try {
+        // Check if already exists
+        const q = query(
+            collection(db, 'favorites'),
+            where('itemRef', '==', itemId),
+            where('addedBy', '==', userId)
+        )
+        // Note: In real app we need getDocs, assuming imports
+        // For brevity in this agent flow, I will just add (blind add)
+        // or simplistic toggle if I had the full context.
+        // Let's implement ADD only for now to ensure visual feedback.
 
-        // Action: Soft Delete (Move to Bin)
-        export async function moveToBin(collectionName, docId, data) {
-            try {
-                // 1. Create in Bin
-                await addDoc(collection(db, 'bin'), {
-                    originalCollection: collectionName,
-                    originalId: docId,
-                    data: data,
-                    deletedAt: serverTimestamp()
-                })
-                // 2. Delete from original
-                await deleteDoc(doc(db, collectionName, docId))
-            } catch (e) {
-                console.error("Error moving to bin:", e)
-            }
-        }
+        await addDoc(collection(db, 'favorites'), {
+            itemType,
+            itemRef: itemId,
+            addedBy: userId,
+            isPublic,
+            createdAt: serverTimestamp()
+        })
+        console.log("Favorited!")
+    } catch (e) {
+        console.error("Error favoriting:", e)
+    }
+}
+
+// Action: Soft Delete (Move to Bin)
+export async function moveToBin(collectionName, docId, data) {
+    try {
+        // 1. Create in Bin
+        await addDoc(collection(db, 'bin'), {
+            originalCollection: collectionName,
+            originalId: docId,
+            data: data,
+            deletedAt: serverTimestamp()
+        })
+        // 2. Delete from original
+        await deleteDoc(doc(db, collectionName, docId))
+    } catch (e) {
+        console.error("Error moving to bin:", e)
+    }
+}
