@@ -1,4 +1,3 @@
-```javascript
 import { useRef, useEffect, useState } from 'react'
 import { Text, Torus } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
@@ -52,7 +51,7 @@ function QuoteRing({ radius, color, category, items, speed, rotationAxis, active
                             anchorX="center"
                             anchorY="middle"
                         >
-                           {isTheOne ? "✨ Today's Message ✨" : "..."}
+                            {isTheOne ? "✨ Today's Message ✨" : "..."}
                         </Text>
                     </group>
                 )
@@ -86,16 +85,16 @@ export default function QuotesPlanet() {
             </Text>
 
             {visibleRings.map((r, i) => (
-                <QuoteRing 
-                key={i}
-                radius={r.radius}
-                color={r.color}
-                category={r.category}
-                items={[...Array(r.count)]}
-                speed={r.speed}
-                rotationAxis={r.rot}
-                activeIndex={currentIndex}
-             />
+                <QuoteRing
+                    key={i}
+                    radius={r.radius}
+                    color={r.color}
+                    category={r.category}
+                    items={[...Array(r.count)]}
+                    speed={r.speed}
+                    rotationAxis={r.rot}
+                    activeIndex={currentIndex}
+                />
             ))}
 
             {/* Exit Portal */}

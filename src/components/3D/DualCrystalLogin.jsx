@@ -1,4 +1,3 @@
-```
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text, Float, Sparkles, MeshTransmissionMaterial } from '@react-three/drei'
@@ -65,7 +64,7 @@ export default function DualCrystalLogin() {
     const handleLogin = (role) => {
         // In a real implementation this would trigger the Auth Overlay
         // For prototype visualization we define the interaction
-        console.log(`Selected ${ role } path`)
+        console.log(`Selected ${role} path`)
         // Temporary Direct Login for testing visuals
         // login({ name: role }, role === 'guest' ? 'guest' : 'admin')
     }
