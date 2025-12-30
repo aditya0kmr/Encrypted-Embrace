@@ -33,7 +33,7 @@ export function useCollection(collectionName, constraints = []) {
 
 // Hook to listen to the single latest mood
 export function useLatestMood() {
-    const { setMood } = useUniverseStore()
+    const { mood, setMood } = useUniverseStore()
 
     useEffect(() => {
         const q = query(
@@ -46,12 +46,13 @@ export function useLatestMood() {
                 const latest = snapshot.docs[0].data()
                 if (latest.moodState) {
                     setMood(latest.moodState)
-                    console.log("Universe Mood Updated:", latest.moodState)
                 }
             }
         })
         return unsubscribe
     }, [])
+
+    return { mood }
 }
 
 // Action: Add a Letter
