@@ -34,7 +34,7 @@ function ReactorCore({ position, color, label, type, onClick }) {
                     <pointLight color={color} distance={10} intensity={2} />
                 </mesh>
             </Float>
-            <Text position={[0, -2, 0]} fontSize={0.3} color={color} font="/assets/fonts/Inter-Bold.woff">
+            <Text position={[0, -2, 0]} fontSize={0.3} color={color} >
                 {label}
             </Text>
             {/* Energy Particle Streams */}

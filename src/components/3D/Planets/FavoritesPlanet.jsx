@@ -44,7 +44,7 @@ function CrystalShard({ position, color, type, label, onClick }) {
                     <meshBasicMaterial color="white" />
                 </mesh>
 
-                <Text position={[0, -1.2, 0]} fontSize={0.15} color="#eef" font="/assets/fonts/Inter-Bold.woff" outlineWidth={0.01} outlineColor="black">
+                <Text position={[0, -1.2, 0]} fontSize={0.15} color="#eef"  outlineWidth={0.01} outlineColor="black">
                     {label}
                 </Text>
 
@@ -101,10 +101,10 @@ export default function FavoritesPlanet() {
             <CrystalCaveEnvironment />
 
             {/* Title */}
-            <Text position={[0, 3, -4]} fontSize={0.8} color="#ccddff" font="/assets/fonts/Inter-Bold.woff">
+            <Text position={[0, 3, -4]} fontSize={0.8} color="#ccddff" >
                 CELESTIAL VAULT
             </Text>
-            <Text position={[0, 2.4, -4]} fontSize={0.3} color="#88aaff" font="/assets/fonts/Inter-Bold.woff">
+            <Text position={[0, 2.4, -4]} fontSize={0.3} color="#88aaff" >
                 {favorites.length} Preserved Memories
             </Text>
 
@@ -135,7 +135,7 @@ export default function FavoritesPlanet() {
                     thickness={2}
                 />
             </mesh>
-            <Text position={[0, -4.5, 0]} fontSize={0.3} color="white" font="/assets/fonts/Inter-Bold.woff">EXIT VAULT</Text>
+            <Text position={[0, -4.5, 0]} fontSize={0.3} color="white" >EXIT VAULT</Text>
             <pointLight position={[0, -6, 0]} color="white" intensity={2} distance={10} />
         </group>
     )

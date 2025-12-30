@@ -75,7 +75,7 @@ export default function JackLDRPlanet() {
     return (
         <group rotation={[0.2, 0, 0]}>
             <Stars count={1000} />
-            <Text position={[0, 4, -2]} fontSize={0.6} color="orange" font="/assets/fonts/Inter-Bold.woff">
+            <Text position={[0, 4, -2]} fontSize={0.6} color="orange" >
                 JACK'S CROSS-COUNTRY JOURNEY
             </Text>
 
@@ -117,7 +117,7 @@ export default function JackLDRPlanet() {
                             <lineBasicMaterial color="orange" />
                         </lineSegments>
                     </mesh>
-                    <Text position={[0, 0, 0.1]} fontSize={0.3} color="#00ff00" font="/assets/fonts/Inter-Bold.woff">
+                    <Text position={[0, 0, 0.1]} fontSize={0.3} color="#00ff00" >
                         Connected: 285 km / 0.0s latency
                     </Text>
                 </group>

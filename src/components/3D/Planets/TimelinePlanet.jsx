@@ -41,7 +41,7 @@ function TimelineNode({ position, title, year, image, onClick }) {
                 </mesh>
 
                 <Text position={[0, 0.8, 0]} fontSize={0.25} color="#ccffff" anchorX="center"
-                    font="/assets/fonts/Inter-Bold.woff" // Optional, fallback to default
+                     // Optional, fallback to default
                     outlineWidth={0.01} outlineColor="#004444"
                 >
                     {title}

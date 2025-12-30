@@ -90,7 +90,7 @@ export default function GalleryPlanet() {
                 <meshBasicMaterial color="#1a0033" side={THREE.BackSide} />
             </mesh>
 
-            <Text position={[0, 4, 0]} fontSize={0.7} color="#e0b0ff" font="/assets/fonts/Inter-Bold.woff">
+            <Text position={[0, 4, 0]} fontSize={0.7} color="#e0b0ff" >
                 HOLOGRAPHIC CLOUD
             </Text>
 
