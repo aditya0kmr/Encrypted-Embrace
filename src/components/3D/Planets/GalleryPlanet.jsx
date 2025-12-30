@@ -1,37 +1,58 @@
 import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Image, Text, Float } from '@react-three/drei'
+import { Image, Text, Float, Sparkles, MeshTransmissionMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import useUniverseStore from '../../../stores/useUniverseStore'
 import { useCollection } from '../../../firebase/hooks'
 
 function PhotoFrame({ url, position, rotation, caption }) {
     const ref = useRef()
-
-    useFrame((state) => {
-        // Floating effect comes from Float wrapper, maybe slight tilt here
-    })
+    const [hovered, setHover] = React.useState(false)
 
     return (
         <group position={position} rotation={rotation}>
             <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-                <group ref={ref}>
+                <group
+                    ref={ref}
+                    onPointerOver={() => setHover(true)}
+                    onPointerOut={() => setHover(false)}
+                >
                     {/* Frame Backing */}
                     <mesh position={[0, 0, -0.05]}>
-                        <boxGeometry args={[1.6, 1.1, 0.05]} />
-                        <meshStandardMaterial color="#222" metalness={0.8} roughness={0.2} />
+                        <boxGeometry args={[1.7, 1.2, 0.05]} />
+                        <meshStandardMaterial color="#222" metalness={0.9} roughness={0.1} />
                     </mesh>
 
                     {/* The Image */}
-                    {url && <Image url={url} scale={[1.5, 1]} />}
+                    {url && <Image url={url} scale={hovered ? [1.6, 1.1] : [1.5, 1]} transparent opacity={0.9} />}
+
+                    {/* Holographic Glass Front */}
+                    <mesh position={[0, 0, 0.05]}>
+                        <boxGeometry args={[1.7, 1.2, 0.02]} />
+                        <MeshTransmissionMaterial
+                            samples={6} thickness={0.1} chromaticAberration={0.5} anisotropy={0.1}
+                            color="#aaeeff" resolution={512}
+                        />
+                    </mesh>
+
+                    {/* Simple Glow Border */}
+                    <mesh position={[0, 0, 0]}>
+                        <planeGeometry args={[1.75, 1.25]} />
+                        <meshBasicMaterial color={hovered ? "#00ffff" : "#555555"} wireframe />
+                    </mesh>
 
                     {/* Caption */}
-                    <Text position={[0, -0.6, 0]} fontSize={0.1} color="white">{caption}</Text>
+                    <Text position={[0, -0.7, 0]} fontSize={0.15} color="#ccffff" outlineWidth={0.01} outlineColor="black">
+                        {caption}
+                    </Text>
                 </group>
             </Float>
         </group>
     )
 }
+
+// Need React for state
+import React from 'react'
 
 export default function GalleryPlanet() {
     const { exitPlanet } = useUniverseStore()
@@ -51,29 +72,38 @@ export default function GalleryPlanet() {
     const displayPhotos = dbPhotos.length > 0 ? dbPhotos.map((p, i) => ({
         url: p.imageURL,
         cap: p.captionText,
-        pos: [(i % 3 - 1) * 3, Math.floor(i / 3) * 2, (i % 2) * 2], // Simple layout algo
-        rot: [0, 0, 0]
+        pos: [
+            (i % 3 - 1) * 4 + (Math.random() - 0.5),
+            Math.floor(i / 3) * 2 - 2,
+            (i % 2) * 2
+        ],
+        rot: [0, (Math.random() - 0.5) * 0.5, 0]
     })) : staticPhotos
 
     return (
         <group>
             {/* Cloud Atmosphere */}
+            <Sparkles count={200} scale={12} size={6} speed={0.4} opacity={0.4} color="#bf00ff" />
+
             <mesh>
-                <sphereGeometry args={[10, 32, 32]} />
-                <meshBasicMaterial color="#bf00ff" wireframe transparent opacity={0.1} />
+                <sphereGeometry args={[15, 32, 32]} />
+                <meshBasicMaterial color="#1a0033" side={THREE.BackSide} />
             </mesh>
 
-            <Text position={[0, 3, 0]} fontSize={0.5} color="#bf00ff">Holographic Cloud</Text>
+            <Text position={[0, 4, 0]} fontSize={0.7} color="#e0b0ff" font="/assets/fonts/Inter-Bold.woff">
+                HOLOGRAPHIC CLOUD
+            </Text>
 
             {displayPhotos.map((p, i) => (
-                <PhotoFrame key={i} {...p} position={p.pos} rotation={p.rot} caption={p.cap} />
+                <PhotoFrame key={i} {...p} />
             ))}
 
             {/* Exit Portal */}
-            <mesh position={[0, -4, 0]} onClick={exitPlanet}>
-                <sphereGeometry args={[0.5]} />
+            <mesh position={[0, -5, 0]} onClick={exitPlanet}>
+                <torusGeometry args={[1, 0.1, 16, 100]} />
                 <meshStandardMaterial color="white" emissive="white" emissiveIntensity={2} />
             </mesh>
+            <Text position={[0, -5, 0]} fontSize={0.2} color="white">EXIT</Text>
         </group>
     )
 }

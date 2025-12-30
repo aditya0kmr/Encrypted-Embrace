@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text, Float, Stars, Sparkles, Html } from '@react-three/drei'
+import { Text, Float, Stars, Sparkles, Html, MeshDistortMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import useUniverseStore from '../../../stores/useUniverseStore'
 import { useCollection, addLetter, toggleFavorite } from '../../../firebase/hooks'
@@ -10,16 +10,6 @@ function ReactorCore({ position, color, label, type, onClick }) {
     const mesh = useRef()
     const [hovered, setHover] = useState(false)
 
-    useFrame((state) => {
-        mesh.current.rotation.y += 0.01
-        mesh.current.rotation.z += 0.005
-        if (hovered) {
-            mesh.current.scale.lerp(new THREE.Vector3(1.2, 1.2, 1.2), 0.1)
-        } else {
-            mesh.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1)
-        }
-    })
-
     return (
         <group position={position}>
             <Float speed={5} rotationIntensity={0.5} floatIntensity={0.5}>
@@ -28,21 +18,27 @@ function ReactorCore({ position, color, label, type, onClick }) {
                     onClick={onClick}
                     onPointerOver={() => setHover(true)}
                     onPointerOut={() => setHover(false)}
+                    scale={hovered ? 1.2 : 1}
                 >
-                    <icosahedronGeometry args={[1.5, 2]} />
-                    <meshStandardMaterial
+                    <sphereGeometry args={[1.5, 64, 64]} />
+                    {/* Liquid Energy Look */}
+                    <MeshDistortMaterial
                         color={color}
                         emissive={color}
                         emissiveIntensity={2}
-                        wireframe
+                        roughness={0.1}
+                        metalness={1}
+                        distort={0.6}
+                        speed={2}
                     />
                     <pointLight color={color} distance={10} intensity={2} />
                 </mesh>
             </Float>
-            <Text position={[0, -2.5, 0]} fontSize={0.3} color={color}>
+            <Text position={[0, -2, 0]} fontSize={0.3} color={color} font="/assets/fonts/Inter-Bold.woff">
                 {label}
             </Text>
-            <Sparkles count={50} scale={4} color={color} size={4} speed={0.4} opacity={0.5} />
+            {/* Energy Particle Streams */}
+            <Sparkles count={100} scale={5} color={color} size={6} speed={1} opacity={0.6} noise={0.5} />
         </group>
     )
 }
@@ -51,18 +47,27 @@ function FloatingLetter({ position, title, body, color }) {
     return (
         <group position={position}>
             <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
-                <mesh>
-                    <planeGeometry args={[3, 4]} />
-                    <meshStandardMaterial color="#111" transparent opacity={0.8} side={THREE.DoubleSide} />
-                    <lineSegments>
-                        <edgesGeometry args={[new THREE.PlaneGeometry(3, 4)]} />
-                        <lineBasicMaterial color={color} />
-                    </lineSegments>
+                {/* Holographic Projection Base */}
+                <mesh position={[0, -2.2, 0]} rotation={[0, 0, 0]}>
+                    <cylinderGeometry args={[1.6, 1.8, 0.2, 32]} />
+                    <meshStandardMaterial color="#222" metalness={0.9} roughness={0.2} />
                 </mesh>
-                <Text position={[0, 1.5, 0.1]} fontSize={0.3} color={color} anchorX="center" maxWidth={2.5}>
+                <mesh position={[0, -2, 0]}>
+                    <cylinderGeometry args={[1.5, 1.5, 0.05, 32]} />
+                    <meshBasicMaterial color={color} />
+                </mesh>
+
+                {/* The "Field" */}
+                <mesh position={[0, 0, 0]}>
+                    <planeGeometry args={[3.2, 4.2]} />
+                    <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.DoubleSide} />
+                </mesh>
+
+                {/* Glowing Text */}
+                <Text position={[0, 1.5, 0.1]} fontSize={0.25} color={color} anchorX="center" maxWidth={2.8} outlineWidth={0.01} outlineColor="black">
                     {title}
                 </Text>
-                <Text position={[0, 0, 0.1]} fontSize={0.15} color="#eee" anchorX="center" anchorY="middle" maxWidth={2.5} lineHeight={1.5}>
+                <Text position={[0, 0, 0.1]} fontSize={0.14} color="#fff" anchorX="center" anchorY="middle" maxWidth={2.8} lineHeight={1.6}>
                     {body}
                 </Text>
             </Float>
