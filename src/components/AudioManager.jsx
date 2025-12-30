@@ -1,18 +1,13 @@
 import { useEffect, useRef } from 'react'
 import useUniverseStore from '../stores/useUniverseStore'
+import { MOOD_AUDIO } from '../utils/audioData'
 
 export default function AudioManager() {
     const { mood } = useUniverseStore()
     const audioRef = useRef(new Audio())
 
-    // Track Mapping (Placeholder - User needs to add files)
-    const tracks = {
-        happy: '/assets/audio/ambient_happy.mp3',
-        loving: '/assets/audio/ambient_loving.mp3',
-        missing: '/assets/audio/ambient_missing.mp3',
-        conflict: '/assets/audio/ambient_conflict.mp3',
-        tired: '/assets/audio/ambient_tired.mp3'
-    }
+    // Track Mapping - Uses Base64 placeholders to ensure no 404s
+    const tracks = MOOD_AUDIO
 
     useEffect(() => {
         const src = tracks[mood] || tracks.happy
