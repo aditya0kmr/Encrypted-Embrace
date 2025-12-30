@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text, Html } from '@react-three/drei'
+import { Text, Html, Torus } from '@react-three/drei'
 import * as THREE from 'three'
 import useUniverseStore from '../../stores/useUniverseStore'
 
@@ -15,28 +15,41 @@ function Planet({ position, color, label, size = 1, texture, onClick }) {
         if (textRef.current) textRef.current.lookAt(state.camera.position)
     })
 
+    // Calculate orbital radius roughly from distance to center (0,0,0)
+    const radius = Math.sqrt(position[0] ** 2 + position[2] ** 2)
+
     return (
-        <group position={position}>
-            <mesh ref={mesh} onClick={onClick}>
-                <sphereGeometry args={[size, 32, 32]} />
-                <meshStandardMaterial
-                    color={color}
-                    roughness={0.7}
-                    metalness={0.2}
-                    emissive={color}
-                    emissiveIntensity={0.1}
-                />
-                {/* Atmosphere glow */}
-                <pointLight color={color} distance={size * 3} intensity={0.5} />
-            </mesh>
-            <Text
-                ref={textRef}
-                position={[0, size + 0.5, 0]}
-                fontSize={0.3}
-                color="white"
-            >
-                {label}
-            </Text>
+        <group>
+            {/* Orbital Ring Trace */}
+            <group rotation={[Math.PI / 2, 0, 0]}>
+                <mesh>
+                    <ringGeometry args={[radius - 0.02, radius + 0.02, 64]} />
+                    <meshBasicMaterial color={color} opacity={0.1} transparent side={THREE.DoubleSide} />
+                </mesh>
+            </group>
+
+            <group position={position}>
+                <mesh ref={mesh} onClick={onClick}>
+                    <sphereGeometry args={[size, 32, 32]} />
+                    <meshStandardMaterial
+                        color={color}
+                        roughness={0.7}
+                        metalness={0.2}
+                        emissive={color}
+                        emissiveIntensity={0.1}
+                    />
+                    {/* Atmosphere glow */}
+                    <pointLight color={color} distance={size * 3} intensity={0.5} />
+                </mesh>
+                <Text
+                    ref={textRef}
+                    position={[0, size + 0.5, 0]}
+                    fontSize={0.3}
+                    color="white"
+                >
+                    {label}
+                </Text>
+            </group>
         </group>
     )
 }
@@ -53,6 +66,8 @@ export default function CosmicAtrium() {
                 <meshBasicMaterial color="white" />
                 <pointLight intensity={2} distance={20} />
             </mesh>
+
+            <Text position={[0, -1, 0]} fontSize={0.2} color="#888">CHRONOS SPHERE</Text>
 
             {/* 1. Serpent of Memory (Timeline) */}
             <Planet
@@ -108,7 +123,16 @@ export default function CosmicAtrium() {
                 />
             )}
 
-            {/* 7. The Bin (Aadi Only) */}
+            {/* 7. Favorites (New) */}
+            <Planet
+                position={[0, 0, -6]}
+                color="#ccddff"
+                label="Celestial Vault"
+                size={0.9}
+                onClick={() => enterPlanet('favorites')}
+            />
+
+            {/* 8. The Bin (Aadi Only) */}
             {(user?.displayName?.includes('Aadi') || (user?.role === 'admin' && !user?.displayName?.includes('Nanniii'))) && (
                 <Planet
                     position={[0, -4, -4]}
