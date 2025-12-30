@@ -18,24 +18,37 @@ import useUniverseStore from '../stores/useUniverseStore'
 export function useCollection(collectionName, constraints = []) {
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
+    const { user } = useUniverseStore()
 
     useEffect(() => {
+        // PERMISSION RULE: Unauthenticated users cannot read DB.
+        if (!user) {
+            setLoading(false)
+            setData([])
+            return
+        }
+
         const q = query(collection(db, collectionName), ...constraints)
         const unsubscribe = onSnapshot(q, (snapshot) => {
             setData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
             setLoading(false)
+        }, (err) => {
+            console.log(`Auth restricted access to: ${collectionName}`)
+            setLoading(false)
         })
         return unsubscribe
-    }, [collectionName, JSON.stringify(constraints)])
+    }, [collectionName, JSON.stringify(constraints), user])
 
     return { data, loading }
 }
 
 // Hook to listen to the single latest mood
 export function useLatestMood() {
-    const { mood, setMood } = useUniverseStore()
+    const { mood, setMood, user } = useUniverseStore()
 
     useEffect(() => {
+        if (!user) return
+
         const q = query(
             collection(db, 'moods'),
             orderBy('createdAt', 'desc'),
@@ -48,9 +61,11 @@ export function useLatestMood() {
                     setMood(latest.moodState)
                 }
             }
+        }, (err) => {
+            // Silence permission error on login screen
         })
         return unsubscribe
-    }, [])
+    }, [user])
 
     return { mood }
 }
