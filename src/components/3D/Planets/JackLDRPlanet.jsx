@@ -1,22 +1,53 @@
-import { useMemo } from 'react'
-import { Line, Text, Float } from '@react-three/drei'
+import { useMemo, useRef } from 'react'
+import { Line, Text, Float, Stars, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { useFrame } from '@react-three/fiber'
 import useUniverseStore from '../../../stores/useUniverseStore'
 import { useCollection } from '../../../firebase/hooks'
 
-function LocationMarker({ position, label, date, color = "orange", onClick }) {
+// Mini Jack for Map
+function MiniJack({ position, color }) {
+    const mesh = useRef()
+    useFrame((state) => {
+        // Run animation (hop)
+        mesh.current.position.y = position[1] + Math.abs(Math.sin(state.clock.elapsedTime * 8)) * 0.2
+        mesh.current.rotation.y += 0.05
+    })
     return (
-        <group position={position} onClick={onClick}>
-            <Float speed={2} rotationIntensity={0.2} floatIntensity={0.2}>
-                <mesh>
-                    <coneGeometry args={[0.2, 0.5, 16]} />
-                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
-                </mesh>
+        <group position={position} ref={mesh}>
+            <mesh scale={0.2}>
+                <sphereGeometry args={[1, 16, 16]} />
+                <meshStandardMaterial color="white" />
+            </mesh>
+            <mesh position={[0, 0.2, 0]} scale={0.15}>
+                <sphereGeometry args={[1, 16, 16]} />
+                <meshStandardMaterial color="white" />
+            </mesh>
+            <mesh position={[0, 0, 0.3]} scale={0.05}>
+                <sphereGeometry args={[1]} />
+                <meshBasicMaterial color="black" />
+            </mesh>
+        </group>
+    )
+}
+
+function LocationMarker({ position, label, date, color = "orange", icon }) {
+    return (
+        <group position={position}>
+            <Float speed={2} rotationIntensity={0} floatIntensity={0.2}>
+                {icon === 'jack' ? (
+                    <MiniJack position={[0, 0, 0]} />
+                ) : (
+                    <mesh>
+                        <cylinderGeometry args={[0, 0.3, 1, 4]} />
+                        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} />
+                    </mesh>
+                )}
             </Float>
-            <Text position={[0, 0.5, 0]} fontSize={0.2} color="white" anchorX="center">
+            <Text position={[0, 0.8, 0]} fontSize={0.2} color="white" anchorX="center" outlineWidth={0.02} outlineColor="black">
                 {label}
             </Text>
-            {date && <Text position={[0, 0.3, 0]} fontSize={0.1} color="#aaa" anchorX="center">{date}</Text>}
+            {date && <Text position={[0, 0.5, 0]} fontSize={0.12} color="#ccc" anchorX="center">{date}</Text>}
         </group>
     )
 }
@@ -25,69 +56,69 @@ export default function JackLDRPlanet() {
     const { exitPlanet } = useUniverseStore()
     const { data: events, loading } = useCollection('jackEvents')
 
-    // Default path (Northern India Arc) if no dynamic events, or map events to this arc
-    // In a real 3D map, we'd project lat/lon to Sphere coords.
-    // For now, we place the dynamic events along a curve.
-
-    // Fallback/Seed events if empty
+    // Seed events
     const displayEvents = events.length > 0 ? events : [
-        { label: "Greater Noida", date: "Start", pos: [2, 1, 0], color: "#00ff00" },
-        { label: "Jaipur", date: "Current", pos: [-1, -1, 0], color: "#ff0055" },
-        { label: "Distance", date: "285km", pos: [0.5, 0, 0], color: "orange" }
+        { label: "Greater Noida (Start)", date: "Sep 2022", pos: [3, 1, 0], color: "#00ff00" },
+        { label: "Jaipur (Current)", date: "Now", pos: [-3, -1, 0], color: "#ff0055", icon: 'jack' },
+        { label: "Dehradun Trip", date: "Jan 2024", pos: [1, 2, -1], color: "yellow" }
     ]
 
     const pathPoints = useMemo(() => {
-        // Create a simple curve passing through the event positions
-        // If we only have 2 points, straight line.
-        if (displayEvents.length < 2) return [new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)]
-
-        return displayEvents.map((e, i) => {
-            // If event has 'pos' (seed), use it. If from DB, generate a pos based on index.
-            if (e.pos) return new THREE.Vector3(...e.pos)
-
-            // Generate curved positions for DB items
-            const t = i / (displayEvents.length - 1) * Math.PI
-            const x = Math.cos(t) * 3
-            const y = Math.sin(t) * 2
-            return new THREE.Vector3(x, y, 0)
-        })
+        if (displayEvents.length < 2) return []
+        // Simple spline
+        const curve = new THREE.CatmullRomCurve3(
+            displayEvents.map(e => new THREE.Vector3(...(e.pos || [0, 0, 0])))
+        )
+        return curve.getPoints(50)
     }, [displayEvents])
 
     return (
-        <group rotation={[-0.5, 0, 0]}>
-            <Text position={[0, 3, 0]} fontSize={0.5} color="orange">
-                JACK'S JOURNEY (LDR)
+        <group rotation={[0.2, 0, 0]}>
+            <Stars count={1000} />
+            <Text position={[0, 4, -2]} fontSize={0.6} color="orange" font="/assets/fonts/Inter-Bold.woff">
+                JACK'S CROSS-COUNTRY JOURNEY
             </Text>
 
-            {/* The Map Base */}
-            <mesh position={[0, 0, -1]}>
-                <planeGeometry args={[12, 8, 32, 32]} />
-                <meshStandardMaterial color="#001133" wireframe />
+            {/* Holographic Terrain Map */}
+            <mesh position={[0, -0.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[12, 8, 64, 64]} />
+                <meshStandardMaterial
+                    color="#001a33"
+                    wireframe
+                    transparent
+                    opacity={0.3}
+                    displacementScale={2}
+                />
             </mesh>
 
-            {/* The Path */}
-            <Line points={pathPoints} color="orange" lineWidth={4} dashed={false} />
+            {/* The Path Element */}
+            <Line points={pathPoints} color="#ffff00" lineWidth={5} opacity={0.8} transparent />
 
             {/* Markers */}
-            {displayEvents.map((e, i) => {
-                const pos = pathPoints[i]
-                return (
-                    <LocationMarker
-                        key={e.id || i}
-                        position={pos}
-                        label={e.location || e.label}
-                        date={e.date}
-                        color={e.color || "orange"}
-                        onClick={() => console.log(e)}
-                    />
-                )
-            })}
+            {displayEvents.map((e, i) => (
+                <LocationMarker
+                    key={i}
+                    position={e.pos || [0, 0, 0]}
+                    label={e.label}
+                    date={e.date}
+                    color={e.color}
+                    icon={e.icon}
+                />
+            ))}
 
-            {/* Distance Indicator (Static for LDR context) */}
-            <Float speed={2} rotationIntensity={0} floatIntensity={0.2}>
-                <group position={[0, -2, 1]}>
-                    <Text position={[0, 0, 0.1]} fontSize={0.3} color="#00ff00">
-                        285 km Connected
+            {/* Distance Hud */}
+            <Float speed={1} floatIntensity={0.2}>
+                <group position={[0, -3, 2]}>
+                    <mesh>
+                        <boxGeometry args={[4, 1, 0.1]} />
+                        <meshStandardMaterial color="black" transparent opacity={0.8} />
+                        <lineSegments>
+                            <edgesGeometry args={[new THREE.BoxGeometry(4, 1, 0.1)]} />
+                            <lineBasicMaterial color="orange" />
+                        </lineSegments>
+                    </mesh>
+                    <Text position={[0, 0, 0.1]} fontSize={0.3} color="#00ff00" font="/assets/fonts/Inter-Bold.woff">
+                        Connected: 285 km / 0.0s latency
                     </Text>
                 </group>
             </Float>
