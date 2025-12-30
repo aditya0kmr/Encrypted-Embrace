@@ -47,27 +47,40 @@ service cloud.firestore {
 }
 ```
 
-## 2. Populating Content
-Since there is no complex Admin Dashboard yet, use the **Firebase Console** to add initial data manually or use the 3D "Inject Signal" button in the Letters Planet.
-- **Collection**: `timelineEvents`
-  - Fields: `title` (string), `year` (string), `img` (URL string).
-- **Collection**: `photos`
-  - Fields: `imageURL` (string), `captionText` (string).
-- **Collection**: `letters`
-  - Fields: `title`, `body`, `type` ("love" or "flirty").
+## 2. Populating Content (The "Start Sequence")
+Once the site is live:
+1.  **Open the Application**: Go to your GitHub Pages URL (e.g., `https://aditya0kmr.github.io/Encrypted-Embrace/`).
+2.  **Login as Architect**:
+    - Click **Aadi**.
+    - Code: `15062024`
+    - Password: `admin123`
+3.  **Inject Memories**: 
+    - **Before** clicking "Fuse Crystals", look at the bottom of the login box.
+    - Click the small hidden button: `[ARCHITECT PROTOCOL: SEED CONTENT]`.
+    - Wait for the alert: "Universe Expanded with New Memories".
+    - *Now* click **Fuse Crystals** to enter.
 
-## 3. Deployment to GitHub Pages
-1. Push your code to GitHub:
-   ```bash
-   git add .
-   git commit -m "Ready for launch"
-   git push origin main
-   ```
-2. The `gh-pages` package is already installed. Deploy triggers manually via:
-   ```bash
-   npm run deploy
-   ```
-   *Make sure your repo settings on GitHub have Pages enabled for the `gh-pages` branch.*
+## 3. Audio System
+The universe supports mood-based ambient music.
+1.  Add MP3 files to `public/assets/audio/` in your local folder.
+2.  Filenames must be:
+    - `ambient_happy.mp3`
+    - `ambient_loving.mp3`
+    - `ambient_missing.mp3`
+    - `ambient_conflict.mp3`
+    - `ambient_tired.mp3`
+3.  Commit and push:
+    ```bash
+    git add public/assets/audio/*.mp3
+    git commit -m "Add ambient music"
+    git push origin main
+    ```
+
+## 4. Deployment to GitHub Pages
+Deployment is now **AUTOMATED**.
+1.  Anytime you push to `main`, a GitHub Action will build and deploy the site.
+2.  Check the "Actions" tab in your GitHub Repo to see the progress.
+3.  No need to run `npm run deploy` manually anymore.
 
 ## 4. Environment Secrets
 Ensure your `.env` variables are added to GitHub Secrets if you use GitHub Actions for automated building, or just build locally with `npm run deploy`.
