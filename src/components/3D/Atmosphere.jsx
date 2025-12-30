@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Stars, Cloud } from '@react-three/drei'
 import * as THREE from 'three'
-import { useLatestMood } from '../../../firebase/hooks'
+import { useLatestMood } from '../../firebase/hooks'
 
 export default function Atmosphere() {
     const { mood } = useLatestMood()
