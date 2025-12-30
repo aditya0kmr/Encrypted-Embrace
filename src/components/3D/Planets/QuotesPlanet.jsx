@@ -6,57 +6,61 @@ import useUniverseStore from '../../../stores/useUniverseStore'
 import { useRotation } from '../../../utils/rotation'
 import { useCollection } from '../../../firebase/hooks'
 
-function QuoteRing({ radius, color, category, items, speed, rotationAxis, activeIndex }) {
+// Simplified Ring signature in parent map
+function QuoteRing({ radius, color, quotes, speed, wave }) {
     const group = useRef()
 
     useFrame((state, delta) => {
         if (group.current) {
-            group.current.rotation.z += delta * speed * 0.5
-            group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.2) * 0.2
+            group.current.rotation.z += delta * speed
+            if (wave) {
+                group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5 + radius) * 0.1
+                group.current.position.y = Math.cos(state.clock.elapsedTime * 0.5 + radius) * 0.2
+            }
         }
     })
 
+    const items = quotes || []
+
     return (
-        <group ref={group} rotation={rotationAxis}>
+        <group ref={group}>
             {/* The Physical Ring */}
-            <Torus args={[radius, 0.1, 16, 100]}>
+            <Torus args={[radius, 0.05, 16, 100]}>
                 <meshStandardMaterial
                     color={color}
                     emissive={color}
                     emissiveIntensity={0.5}
                     transparent
-                    opacity={0.6}
+                    opacity={0.3}
                 />
             </Torus>
 
-            {/* Floating Text Nodes along the ring */}
-            {items.map((offset, i) => {
-                const angle = (i / items.length) * Math.PI * 2
+            {items.map((q, i) => {
+                const angle = (i / (items.length || 1)) * Math.PI * 2
                 const x = Math.cos(angle) * radius
                 const y = Math.sin(angle) * radius
-
-                // Show specific text if this is the "Active" one from rotation, else generic
-                const isTheOne = i === (activeIndex % items.length)
-
                 return (
-                    <group key={i} position={[x, y, 0]} rotation={[0, 0, angle + Math.PI / 2]}>
-                        <mesh>
-                            <planeGeometry args={[3, 0.5]} />
-                            <meshBasicMaterial color={color} transparent opacity={0.1} side={THREE.DoubleSide} />
-                        </mesh>
+                    <group key={i} position={[x, y, 0]} rotation={[0, 0, angle - Math.PI / 2]}>
                         <Text
-                            position={[0, 0, 0.06]}
-                            fontSize={isTheOne ? 0.3 : 0.15}
+                            fontSize={0.2}
                             color="white"
-                            anchorX="center"
-                            anchorY="middle"
+                            maxWidth={4}
+                            textAlign="center"
+                            anchorY="bottom"
                         >
-                            {isTheOne ? "✨ Today's Message ✨" : "..."}
+                            {q.text}
                         </Text>
                     </group>
                 )
             })}
         </group>
+    )
+}
+                        </Text >
+                    </group >
+                )
+            })}
+        </group >
     )
 }
 

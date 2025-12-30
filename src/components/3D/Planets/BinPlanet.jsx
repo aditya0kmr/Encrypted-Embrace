@@ -46,6 +46,41 @@ function DeletedItem({ position, data, onRestore, onErase }) {
     )
 }
 
+// Vortex Particle System
+function VortexDebris() {
+    const count = 200;
+    const mesh = useRef();
+
+    useFrame((state, delta) => {
+        mesh.current.rotation.y += delta * 0.5;
+        mesh.current.rotation.z += delta * 0.2;
+    });
+
+    const particles = useMemo(() => {
+        const temp = [];
+        for (let i = 0; i < count; i++) {
+            const r = 3 + Math.random() * 5;
+            const theta = Math.random() * Math.PI * 2;
+            const x = r * Math.cos(theta);
+            const z = r * Math.sin(theta);
+            const y = (Math.random() - 0.5) * 4;
+            temp.push({ pos: [x, y, z], scale: Math.random() * 0.1 });
+        }
+        return temp;
+    }, []);
+
+    return (
+        <group ref={mesh}>
+            {particles.map((p, i) => (
+                <mesh key={i} position={p.pos}>
+                    <dodecahedronGeometry args={[p.scale, 0]} />
+                    <meshBasicMaterial color="#333" wireframe />
+                </mesh>
+            ))}
+        </group>
+    );
+}
+
 export default function BinPlanet() {
     const { exitPlanet, user } = useUniverseStore()
 
@@ -94,6 +129,8 @@ export default function BinPlanet() {
             <Text position={[0, 4, -8]} fontSize={0.6} color="#333">
                 ARCHIVE (RESTRICTED)
             </Text>
+
+            <VortexDebris />
 
             {/* Render Grid of Deleted Items */}
             {binItems.length === 0 ? (
