@@ -80,8 +80,16 @@ export default function GalleryPlanet() {
         rot: [0, (Math.random() - 0.5) * 0.5, 0]
     })) : staticPhotos
 
+    const group = useRef()
+    useFrame((state, delta) => {
+        if (group.current) {
+            group.current.rotation.y += delta * 0.05
+            group.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.05
+        }
+    })
+
     return (
-        <group>
+        <group ref={group}>
             {/* Cloud Atmosphere */}
             <Sparkles count={200} scale={12} size={6} speed={0.4} opacity={0.4} color="#bf00ff" />
 

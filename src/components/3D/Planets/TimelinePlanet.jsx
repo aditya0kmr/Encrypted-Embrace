@@ -12,6 +12,8 @@ function TimelineNode({ position, title, year, image, onClick }) {
     useFrame((state, delta) => {
         if (mesh.current) {
             mesh.current.rotation.y += delta * 0.5
+            // Bobbing animation for polish
+            mesh.current.position.y = position.y + Math.sin(state.clock.elapsedTime * 2 + position.x) * 0.1
         }
     })
 
@@ -41,7 +43,7 @@ function TimelineNode({ position, title, year, image, onClick }) {
                 </mesh>
 
                 <Text position={[0, 0.8, 0]} fontSize={0.25} color="#ccffff" anchorX="center"
-                     // Optional, fallback to default
+                    // Optional, fallback to default
                     outlineWidth={0.01} outlineColor="#004444"
                 >
                     {title}
@@ -92,17 +94,42 @@ export default function TimelinePlanet() {
         return curve.getPoint(t)
     }
 
+    const texture = useMemo(() => {
+        // Procedural grid texture
+        const canvas = document.createElement('canvas');
+        canvas.width = 512; canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 512);
+        ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2;
+        // Draw grid
+        for (let i = 0; i < 512; i += 32) {
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+        }
+        return new THREE.CanvasTexture(canvas);
+    }, [])
+
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
+    useFrame((state, delta) => {
+        // Animate texture flow
+        texture.offset.x -= delta * 0.2
+    })
+
     return (
         <group>
-            {/* Serpent Body (Glowing Tube) */}
-            <Tube args={[curve, 64, 0.2, 8, false]}>
+            {/* Serpent Body (Glowing Tube with Flow) */}
+            <Tube args={[curve, 64, 0.4, 8, false]}>
                 <meshStandardMaterial
+                    map={texture}
                     color="#0088aa"
                     emissive="#004455"
-                    emissiveIntensity={1}
+                    emissiveIntensity={2}
                     roughness={0.2}
                     metalness={0.8}
-                    wireframe={false}
+                    transparent
+                    opacity={0.8}
                 />
             </Tube>
 

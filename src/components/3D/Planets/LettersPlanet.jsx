@@ -31,7 +31,7 @@ function ReactorCore({ position, color, label, type, onClick }) {
                         distort={0.6}
                         speed={2}
                     />
-                    <pointLight color={color} distance={10} intensity={2} />
+                    <pointLight color={color} distance={10} intensity={2 + Math.sin(Date.now() * 0.003) * 1} />
                 </mesh>
             </Float>
             <Text position={[0, -2, 0]} fontSize={0.3} color={color} >
