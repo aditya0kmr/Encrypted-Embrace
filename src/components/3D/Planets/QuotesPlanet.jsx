@@ -56,13 +56,7 @@ function QuoteRing({ radius, color, quotes, speed, wave }) {
         </group>
     )
 }
-                        </Text >
-                    </group >
-                )
-            })}
-        </group >
-    )
-}
+// (Removed junk)
 
 export default function QuotesPlanet() {
     const { exitPlanet, user } = useUniverseStore()
