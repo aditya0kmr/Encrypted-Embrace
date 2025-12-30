@@ -47,40 +47,23 @@ service cloud.firestore {
 }
 ```
 
-## 2. Populating Content (The "Start Sequence")
-Once the site is live:
-1.  **Open the Application**: Go to your GitHub Pages URL (e.g., `https://aditya0kmr.github.io/Encrypted-Embrace/`).
-2.  **Login as Architect**:
-    - Click **Aadi**.
-    - Code: `15062024`
-    - Password: `admin123`
-3.  **Inject Memories**: 
-    - **Before** clicking "Fuse Crystals", look at the bottom of the login box.
-    - Click the small hidden button: `[ARCHITECT PROTOCOL: SEED CONTENT]`.
-    - Wait for the alert: "Universe Expanded with New Memories".
-    - *Now* click **Fuse Crystals** to enter.
+## 5. Visual Guide (What to Look For)
+When physically verifying the universe, look for these specific upgrade signatures:
 
-## 3. Audio System
+| Zone | Signature Feature | Premium Detail |
+| :--- | :--- | :--- |
+| **Atmosphere** | **Mood Physics** | Fog density and color shifting strictly matches Prompt specs (Pink/Teal/Gold/Purple). |
+| **Timeline** | **Serpent of Memory** | A glowing, winding tube in space. Memories are **Glass Orbs** with floating sparkles. |
+| **Gallery** | **Holographic Cloud** | Photos have **Holographic Glass layers** and react to hover with neon borders. |
+| **Letters** | **Liquid Cores** | The Love/Flirty reactors use **Distorted Fluid materials** that ripple like liquid light. |
+| **Her Corner** | **Forensic Lab** | Three giant rotating **DNA Helices** and **Glass Evidence Folders**. |
+| **Jack LDR** | **Holographic Map** | A blue terrain grid with a **3D Mini Jack** hopping at current location. |
+| **Favorites** | **Crystal Cave** | Memories encased in **Geometric Diamond Shards** spiraling in a Fibonacci pattern. |
+
+## 6. Audio System
 The universe supports mood-based ambient music.
 1.  Add MP3 files to `public/assets/audio/` in your local folder.
-2.  Filenames must be:
-    - `ambient_happy.mp3`
-    - `ambient_loving.mp3`
-    - `ambient_missing.mp3`
-    - `ambient_conflict.mp3`
-    - `ambient_tired.mp3`
-3.  Commit and push:
-    ```bash
-    git add public/assets/audio/*.mp3
-    git commit -m "Add ambient music"
-    git push origin main
-    ```
-
-## 4. Deployment to GitHub Pages
-Deployment is now **AUTOMATED**.
-1.  Anytime you push to `main`, a GitHub Action will build and deploy the site.
-2.  Check the "Actions" tab in your GitHub Repo to see the progress.
-3.  No need to run `npm run deploy` manually anymore.
+2.  Filenames: `ambient_happy.mp3`, `ambient_loving.mp3`, `ambient_missing.mp3`, `ambient_conflict.mp3`, `ambient_tired.mp3`.
 
 ## 4. Environment Secrets
 Ensure your `.env` variables are added to GitHub Secrets if you use GitHub Actions for automated building, or just build locally with `npm run deploy`.
