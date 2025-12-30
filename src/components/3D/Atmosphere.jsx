@@ -30,7 +30,8 @@ export default function Atmosphere() {
         <group>
             {/* Dynamic Fog */}
             <fog attach="fog" args={[activeColor, 5, 40]} />
-            <common color={activeColor} />
+            <color attach="background" args={[activeColor]} />
+
 
             {/* Ambient Light Tint */}
             <ambientLight intensity={0.5} color={activeColor} />
